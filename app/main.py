@@ -4,6 +4,8 @@ from .compute import router as compute_router
 from .jobs import router as jobs_router
 from .payment import router as payment_router
 from .reputation import router as reputation_router
+from .proof import router as proof_router
+from .wallet import router as wallet_router
 
 
 app = FastAPI(
@@ -16,6 +18,8 @@ app.include_router(payment_router)
 app.include_router(compute_router)
 app.include_router(jobs_router)
 app.include_router(reputation_router)
+app.include_router(proof_router)
+app.include_router(wallet_router)
 
 
 @app.get("/")
