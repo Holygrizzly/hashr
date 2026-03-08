@@ -1,0 +1,247 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "hashr",
+    "version": "0.1.0",
+    "description": "Machine-payable compute server that supports AI agents using the x402 payment protocol."
+  },
+  "paths": {
+    "/compute/hash": {
+      "post": {
+        "summary": "Hash input payload",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"type": "object"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Hash computed",
+            "content": {
+              "application/json": {
+                "schema": {"type": "object"}
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/PaymentRequired"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/compute/search": {
+      "post": {
+        "summary": "Search within a corpus",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"type": "object"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {"type": "object"}
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/PaymentRequired"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/compute/inference": {
+      "post": {
+        "summary": "Simulate inference",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"type": "object"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inference response",
+            "content": {
+              "application/json": {
+                "schema": {"type": "object"}
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/PaymentRequired"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job": {
+      "post": {
+        "summary": "Create a job",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"type": "object"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Job created",
+            "content": {
+              "application/json": {
+                "schema": {"type": "object"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job/{id}": {
+      "get": {
+        "summary": "Get job status",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Job details",
+            "content": {
+              "application/json": {
+                "schema": {"type": "object"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/job/{id}/execute": {
+      "post": {
+        "summary": "Execute a job",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Job executed",
+            "content": {
+              "application/json": {
+                "schema": {"type": "object"}
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/PaymentRequired"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agent/register": {
+      "post": {
+        "summary": "Register an agent",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"type": "object"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent registered",
+            "content": {
+              "application/json": {
+                "schema": {"type": "object"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reputation/query": {
+      "post": {
+        "summary": "Query agent reputation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"type": "object"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent reputation",
+            "content": {
+              "application/json": {
+                "schema": {"type": "object"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agent/{id}": {
+      "get": {
+        "summary": "Get agent details",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "responses": {
+          "200": {
+            "description": "Agent details",
+            "content": {
+              "application/json": {
+                "schema": {"type": "object"}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PaymentRequired": {
+        "type": "object",
+        "properties": {
+          "price": {"type": "number"},
+          "payment_address": {"type": "string"},
+          "job_id": {"type": "string"}
+        },
+        "required": ["price", "payment_address", "job_id"]
+      }
+    }
+  }
+}
