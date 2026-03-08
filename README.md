@@ -32,3 +32,10 @@ Content-Type: application/json
   "job_id": "job-example"
 }
 ```
+
+## Agent Services
+These endpoints help turn hashr into a usable agent service layer. They are machine-payable (x402) and may return `402 Payment Required` with a quote.
+
+- **Proof verification**: POST `/proof/verify` and GET `/proof/{job_id}`
+- **Wallet risk analysis**: POST `/wallet/risk`
+- **ERC8004 reputation lookup**: POST `/reputation/erc8004`
