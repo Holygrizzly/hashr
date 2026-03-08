@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "hashr",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Machine-payable compute server that supports AI agents using the x402 payment protocol."
   },
   "paths": {
@@ -13,7 +13,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {"type": "object"}
+              "schema": {
+                "type": "object"
+              }
             }
           }
         },
@@ -22,7 +24,9 @@
             "description": "Hash computed",
             "content": {
               "application/json": {
-                "schema": {"type": "object"}
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           },
@@ -30,7 +34,9 @@
             "description": "Payment Required",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/PaymentRequired"}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
               }
             }
           }
@@ -39,21 +45,25 @@
     },
     "/compute/search": {
       "post": {
-        "summary": "Search within a corpus",
+        "summary": "Search for values",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {"type": "object"}
+              "schema": {
+                "type": "object"
+              }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Search results",
+            "description": "Search completed",
             "content": {
               "application/json": {
-                "schema": {"type": "object"}
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           },
@@ -61,7 +71,9 @@
             "description": "Payment Required",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/PaymentRequired"}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
               }
             }
           }
@@ -70,21 +82,25 @@
     },
     "/compute/inference": {
       "post": {
-        "summary": "Simulate inference",
+        "summary": "Run inference",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {"type": "object"}
+              "schema": {
+                "type": "object"
+              }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Inference response",
+            "description": "Inference completed",
             "content": {
               "application/json": {
-                "schema": {"type": "object"}
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           },
@@ -92,7 +108,9 @@
             "description": "Payment Required",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/PaymentRequired"}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
               }
             }
           }
@@ -102,20 +120,14 @@
     "/job": {
       "post": {
         "summary": "Create a job",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {"type": "object"}
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Job created",
             "content": {
               "application/json": {
-                "schema": {"type": "object"}
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           }
@@ -126,14 +138,23 @@
       "get": {
         "summary": "Get job status",
         "parameters": [
-          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
-            "description": "Job details",
+            "description": "Job record",
             "content": {
               "application/json": {
-                "schema": {"type": "object"}
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           }
@@ -144,14 +165,23 @@
       "post": {
         "summary": "Execute a job",
         "parameters": [
-          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "Job executed",
             "content": {
               "application/json": {
-                "schema": {"type": "object"}
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           },
@@ -159,7 +189,148 @@
             "description": "Payment Required",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/PaymentRequired"}
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/proof/verify": {
+      "post": {
+        "summary": "Verify proof of work",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "job_id": {
+                    "type": "string"
+                  },
+                  "input_hash": {
+                    "type": "string"
+                  },
+                  "output_hash": {
+                    "type": "string"
+                  },
+                  "worker_agent": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "job_id",
+                  "input_hash",
+                  "output_hash",
+                  "worker_agent"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Proof verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/proof/{job_id}": {
+      "get": {
+        "summary": "Get a proof record",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Proof record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/wallet/risk": {
+      "post": {
+        "summary": "Simulate wallet risk score",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wallet": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "wallet"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risk score computed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
               }
             }
           }
@@ -169,20 +340,14 @@
     "/agent/register": {
       "post": {
         "summary": "Register an agent",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {"type": "object"}
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Agent registered",
             "content": {
               "application/json": {
-                "schema": {"type": "object"}
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           }
@@ -192,20 +357,14 @@
     "/reputation/query": {
       "post": {
         "summary": "Query agent reputation",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {"type": "object"}
-            }
-          }
-        },
         "responses": {
           "200": {
-            "description": "Agent reputation",
+            "description": "Reputation score",
             "content": {
               "application/json": {
-                "schema": {"type": "object"}
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           }
@@ -214,16 +373,42 @@
     },
     "/agent/{id}": {
       "get": {
-        "summary": "Get agent details",
+        "summary": "Get agent profile",
         "parameters": [
-          {"name": "id", "in": "path", "required": true, "schema": {"type": "string"}}
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
-            "description": "Agent details",
+            "description": "Agent record",
             "content": {
               "application/json": {
-                "schema": {"type": "object"}
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reputation/erc8004": {
+      "post": {
+        "summary": "ERC8004 reputation lookup",
+        "responses": {
+          "200": {
+            "description": "ERC8004 reputation profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           }
@@ -236,11 +421,21 @@
       "PaymentRequired": {
         "type": "object",
         "properties": {
-          "price": {"type": "number"},
-          "payment_address": {"type": "string"},
-          "job_id": {"type": "string"}
+          "price": {
+            "type": "number"
+          },
+          "payment_address": {
+            "type": "string"
+          },
+          "job_id": {
+            "type": "string"
+          }
         },
-        "required": ["price", "payment_address", "job_id"]
+        "required": [
+          "price",
+          "payment_address",
+          "job_id"
+        ]
       }
     }
   }
