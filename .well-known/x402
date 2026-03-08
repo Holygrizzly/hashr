@@ -1,0 +1,24 @@
+{
+  "protocol": "x402",
+  "version": "0.1",
+  "payment_address": "HASHR_DEMO_ADDRESS",
+  "price": {
+    "unit": "credits",
+    "model": "per_job",
+    "example": 10
+  },
+  "proof_header": "X-402-Payment",
+  "docs": "Send X-402-Payment proof with your request. If missing, the server replies with HTTP 402 and a quote.",
+  "endpoints": [
+    "/compute/hash",
+    "/compute/search",
+    "/compute/inference",
+    "/job",
+    "/job/{id}",
+    "/job/{id}/execute",
+    "/reputation/query",
+    "/agent/register",
+    "/agent/{id}",
+    "/pay/verify"
+  ]
+}
