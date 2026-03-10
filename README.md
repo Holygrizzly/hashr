@@ -22,6 +22,10 @@ Content-Type: application/json
 ```
 
 **Response**
+## Agent Identity
+Agents can register an ed25519 public key, and then sign messages.
+The node can verify signatures (placeholder verification in this scaffold), and signature verification can be machine-paid via x402.
+
 ```
 HTTP/1.1 402 Payment Required
 Content-Type: application/json
