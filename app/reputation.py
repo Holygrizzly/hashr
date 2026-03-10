@@ -43,3 +43,23 @@ def get_agent(id: str):
     if agent is None:
         raise HTTPException(status_code=404, detail="agent not found")
     return {"agent_id": id, **agent}
+
+@router.post("/reputation/erc8004")
+def erc8004_reputation(payload: ReputationQuery):
+    agent = agents.get(payload.id)
+    if agent is None:
+        raise HTTPException(status_code=404, detail="agent not found")
+
+    reputation = int(agent.get("reputation", 0))
+    trust_score = max(0, min(100, reputation))
+    completed_jobs = int(agent.get("completed_jobs", reputation * 2))
+    failed_jobs = int(agent.get("failed_jobs", reputation // 25))
+    fraud_reports = int(agent.get("fraud_reports", 0))
+
+    return {
+        "agent_id": payload.id,
+        "trust_score": trust_score,
+        "completed_jobs": completed_jobs,
+        "failed_jobs": failed_jobs,
+        "fraud_reports": fraud_reports,
+    }
