@@ -1,0 +1,23 @@
+{
+"name": "hashr",
+"ens": "hashr.eth",
+"type": "agent-node",
+"version": "0.1",
+"protocol": "x402",
+"capabilities": [
+"compute",
+"jobs",
+"proof-verification",
+"wallet-risk",
+"reputation",
+"identity"
+],
+"endpoints": {
+"compute": "/compute",
+"jobs": "/job",
+"proof": "/proof",
+"wallet": "/wallet",
+"reputation": "/reputation",
+"identity": "/agent"
+}
+}
