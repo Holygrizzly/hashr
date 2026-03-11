@@ -1,0 +1,17 @@
+{
+"ens": "hashr.eth",
+"service": "hashr-node",
+"protocol": "x402",
+"version": "0.1",
+"repository": "https://github.com/Holygrizzly/hashr",
+"discovery": "/.well-known/hashr",
+"openapi": "/openapi.json",
+"endpoints": {
+"compute": "/compute",
+"jobs": "/job",
+"proof": "/proof",
+"wallet": "/wallet",
+"reputation": "/reputation",
+"identity": "/agent"
+}
+}
