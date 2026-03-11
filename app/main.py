@@ -16,6 +16,7 @@ from .registry import router as registry_router
 from .metrics import router as metrics_router
 from .handshake import router as handshake_router
 from .payments import router as payments_router
+from .queue import router as queue_router
 
 app = FastAPI(
     title="hashr",
@@ -39,10 +40,11 @@ app.include_router(registry_router)
 app.include_router(metrics_router)
 app.include_router(handshake_router)
 app.include_router(payments_router)
+app.include_router(queue_router)
+
 
 @app.get("/")
 def root():
-    """Simple service metadata and protocol hint."""
     return {
         "service": "hashr",
         "protocol": "x402",
