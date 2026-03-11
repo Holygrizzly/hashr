@@ -10,6 +10,7 @@ from .identity import router as identity_router
 from .manifest import router as manifest_router
 from .health import router as health_router
 from .capabilities import router as capabilities_router
+from .pricing import router as pricing_router
 from .registry import router as registry_router
 
 
@@ -30,6 +31,7 @@ app.include_router(identity_router)
 app.include_router(manifest_router)
 app.include_router(health_router)
 app.include_router(capabilities_router)
+app.include_router(pricing_router)
 app.include_router(registry_router)
 
 
