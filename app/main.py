@@ -8,6 +8,7 @@ from .wallet import router as wallet_router
 from .identity import router as identity_router
 from .manifest import router as manifest_router
 from .health import router as health_router
+from .capabilities import router as capabilities_router
 
 app = FastAPI(
     title="hashr",
@@ -24,6 +25,7 @@ app.include_router(wallet_router)
 app.include_router(identity_router)
 app.include_router(manifest_router)
 app.include_router(health_router)
+app.include_router(capabilities_router)
 
 
 @app.get("/")
