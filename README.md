@@ -43,3 +43,11 @@ These endpoints help turn hashr into a usable agent service layer. They are mach
 - **Proof verification**: POST `/proof/verify` and GET `/proof/{job_id}`
 - **Wallet risk analysis**: POST `/wallet/risk`
 - **ERC8004 reputation lookup**: POST `/reputation/erc8004`
+
+## ENS Identity
+
+The hashr node is associated with the Ethereum Name Service (ENS) domain:
+
+hashr.eth
+
+Agents and services may use this ENS name to resolve the canonical node identity, payment destination, and service metadata.
