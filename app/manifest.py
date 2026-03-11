@@ -1,6 +1,10 @@
+from pathlib import Path
 from fastapi import APIRouter
 
+VERSION = Path("VERSION").read_text().strip()
+
 router = APIRouter(prefix="/manifest", tags=["manifest"])
+
 
 @router.get("")
 def get_manifest():
@@ -8,7 +12,7 @@ def get_manifest():
         "name": "hashr",
         "ens": "hashr.eth",
         "protocol": "x402",
-        "version": "0.1",
+        "version": VERSION,
         "capabilities": [
             "compute",
             "jobs",
