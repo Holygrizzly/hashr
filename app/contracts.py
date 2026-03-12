@@ -112,6 +112,7 @@ def analyze_contract(
     }
 
     return {
+        
         "service": "hashr",
         "version": VERSION,
         "analysis": {
