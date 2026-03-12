@@ -28,6 +28,18 @@ def analyze_contract(
 
     code = w3.eth.get_code(address).hex()
 
+    implementation_address = None
+
+    try:
+        slot = "0x360894A13BA1A3210667C828492DB98DCA3E2076CC3735A920A3CA505D382BBC"
+        raw = w3.eth.get_storage_at(address, slot).hex()
+
+        if raw and raw != "0x":
+            implementation_address = "0x" + raw[-40:]
+
+    except Exception:
+        implementation_address = None
+
     owner_address = None
     ownership_renounced = False
 
@@ -96,6 +108,7 @@ def analyze_contract(
         "honeypot_pattern": honeypot_pattern,
         "owner_detected": owner_address is not None,
         "ownership_renounced": ownership_renounced,
+        "proxy_implementation_detected": implementation_address is not None,
     }
 
     return {
@@ -105,6 +118,7 @@ def analyze_contract(
             "address": address,
             "has_code": has_code,
             "code_size": code_size,
+            "implementation_address": implementation_address,
             "owner_address": owner_address,
             "ownership_renounced": ownership_renounced,
             "proxy_pattern_detected": proxy_pattern,
@@ -116,6 +130,3 @@ def analyze_contract(
             "status": "basic-security-analysis",
         },
     }
-
-
-# ownership detection formatting
