@@ -25,6 +25,7 @@ def pricing():
             "wallet-risk": 5,
             "reputation": 5,
             "identity-verification": 5,
+            "contract-analysis": 10,
         },
         "currency": "credits",
     }
