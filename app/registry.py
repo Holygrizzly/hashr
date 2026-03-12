@@ -5,6 +5,7 @@ router = APIRouter(prefix="/registry", tags=["registry"])
 
 VERSION = Path("VERSION").read_text().strip()
 
+
 @router.get("")
 def registry():
     return {
@@ -20,6 +21,7 @@ def registry():
             "/proof/verify",
             "/proof/{job_id}",
             "/wallet/risk",
+            "/contract/analyze",
             "/reputation/query",
             "/reputation/erc8004",
             "/agent/register",
