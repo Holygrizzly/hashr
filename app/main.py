@@ -13,6 +13,7 @@ from .health import router as health_router
 from .capabilities import router as capabilities_router
 from .pricing import router as pricing_router
 from .registry import router as registry_router
+from .contracts import router as contracts_router
 from .metrics import router as metrics_router
 from .handshake import router as handshake_router
 from .payments import router as payments_router
@@ -39,6 +40,7 @@ app.include_router(health_router)
 app.include_router(capabilities_router)
 app.include_router(pricing_router)
 app.include_router(registry_router)
+app.include_router(contracts_router)
 app.include_router(metrics_router)
 app.include_router(handshake_router)
 app.include_router(payments_router)
