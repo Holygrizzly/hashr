@@ -5,6 +5,7 @@ router = APIRouter(prefix="/capabilities", tags=["capabilities"])
 
 VERSION = Path("VERSION").read_text().strip()
 
+
 @router.get("")
 def capabilities():
     return {
@@ -16,6 +17,7 @@ def capabilities():
             "proof-verification",
             "wallet-risk",
             "reputation",
-            "identity"
-        ]
+            "identity",
+            "contract-analysis",
+        ],
     }
