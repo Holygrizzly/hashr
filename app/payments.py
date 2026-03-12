@@ -5,6 +5,7 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 
 VERSION = Path("VERSION").read_text().strip()
 
+
 @router.get("")
 def payments():
     return {
@@ -21,5 +22,6 @@ def payments():
             "/proof/verify",
             "/proof/{job_id}",
             "/wallet/risk",
+            "/contract/analyze",
         ],
     }
