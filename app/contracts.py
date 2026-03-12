@@ -45,6 +45,19 @@ def analyze_contract(
     if owner_pattern:
         risk_score += 10
 
+    if risk_score >= 50:
+        risk_level = "high"
+    elif risk_score >= 20:
+        risk_level = "medium"
+    else:
+        risk_level = "low"
+
+    flags = {
+        "no_code": not has_code,
+        "proxy_pattern": proxy_pattern,
+        "ownership_pattern": owner_pattern,
+    }
+
     return {
         "service": "hashr",
         "version": VERSION,
@@ -55,6 +68,8 @@ def analyze_contract(
             "proxy_pattern_detected": proxy_pattern,
             "ownership_pattern_detected": owner_pattern,
             "risk_score": risk_score,
+            "risk_level": risk_level,
+            "flags": flags,
             "status": "basic-security-analysis",
         },
     }
