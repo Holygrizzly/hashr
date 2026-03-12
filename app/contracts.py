@@ -17,11 +17,9 @@ w3 = Web3(Web3.HTTPProvider(RPC_URL))
 def analyze_contract(
     payload: dict,
     request: Request,
-    x_402_payment: str | None = Header(None, alias="X-402-Payment"), # formatting
-    
-    
+    X_402_payment: str | None = Header(None, alias="X-402-Payment"),
 ):
-    verify_payment(job_id="contract_analyze", request=request, x_402_payment=x_402_payment)
+    verify_payment(job_id="contract_analyze", request=request, x_402_payment=X_402_payment)
 
     address = payload.get("address")
 
@@ -30,9 +28,59 @@ def analyze_contract(
 
     code = w3.eth.get_code(address).hex()
 
+    owner_address = None
+    ownership_renounced = False
+
+    try:
+        owner_abi = [
+            {
+                "constant": True,
+                "inputs": [],
+                "name": "owner",
+                "outputs": [{"name": "", "type": "address"}],
+                "type": "function",
+            }
+        ]
+
+        contract = w3.eth.contract(address=address, abi=owner_abi)
+        owner_address = contract.functions.owner().call()
+
+        if owner_address == "0x0000000000000000000000000000000000000000":
+            ownership_renounced = True
+    except Exception:
+        owner_address = None
+
+    has_code = code != "0x"
+    code_size = len(code)
+
+    proxy_pattern = "delegatecall" in code.lower()
+    owner_pattern = "owner" in code.lower()
+
+    honeypot_pattern = False
+    suspicious_terms = [
+        "revert",
+        "require",
+        "assert",
+        "stop",
+    ]
+
+    for term in suspicious_terms:
+        if term in code.lower():
+            honeypot_pattern = True
+            break
+
     implementation_address = None
-    
-     erc20_functions = [
+
+    try:
+        slot = "0x360894A13BA1A3210667C828492DB98DCA3E2076CC3735A920A3CA505D382BBC"
+        raw = w3.eth.get_storage_at(address, slot).hex()
+
+        if raw and raw != "0x":
+            implementation_address = "0x" + raw[-40:]
+    except Exception:
+        implementation_address = None
+
+    erc20_functions = [
         "70a08231",  # balanceOf
         "a9059cbb",  # transfer
         "095ea7b3",  # approve
@@ -46,43 +94,18 @@ def analyze_contract(
             erc20_detected = True
             break
 
+    verified_contract = False
 
-    try:
-        slot = "0x360894A13BA1A3210667C828492DB98DCA3E2076CC3735A920A3CA505D382BBC"
-        raw = w3.eth.get_storage_at(address, slot).hex()
+    metadata_markers = [
+        "a2646970667358",  # solc metadata prefix
+        "solc",
+        "ipfs",
+    ]
 
-        if raw and raw != "0x":
-            implementation_address = "0x" + raw[-40:]
-
-    except Exception:
-        implementation_address = None
-
-    owner_address = None
-    ownership_renounced = False
-
-    try:
-        owner_abi = [{
-            "constant": True,
-            "inputs": [],
-            "name": "owner",
-            "outputs": [{"name": "", "type": "address"}],
-            "type": "function"
-        }]
-
-        contract = w3.eth.contract(address=address, abi=owner_abi)
-        owner_address = contract.functions.owner().call()
-
-        if owner_address == "0x0000000000000000000000000000000000000000":
-            ownership_renounced = True
-
-    except Exception:
-        owner_address = None
-
-    has_code = code != "0x"
-    code_size = len(code)
-
-    proxy_pattern = "delegatecall" in code.lower()
-    owner_pattern = "owner" in code.lower()
+    for marker in metadata_markers:
+        if marker in code.lower():
+            verified_contract = True
+            break
 
     tax_pattern = False
 
@@ -100,35 +123,25 @@ def analyze_contract(
             tax_pattern = True
             break
 
-    honeypot_pattern = False
-
-    suspicious_patterns = [
-        "transferfrom",
-        "revert",
-        "require",
-    ]
-
-    for pattern in suspicious_patterns:
-        if pattern in code.lower():
-            honeypot_pattern = True
-            break
-
     risk_score = 0
 
     if not has_code:
         risk_score += 50
 
     if proxy_pattern:
-        risk_score += 25
+        risk_score += 20
 
     if owner_pattern:
         risk_score += 10
 
+    if honeypot_pattern:
+        risk_score += 20
+
     if tax_pattern:
         risk_score += 20
 
-    if honeypot_pattern:
-        risk_score += 40
+    if not verified_contract:
+        risk_score += 5
 
     if risk_score >= 50:
         risk_level = "high"
@@ -143,7 +156,8 @@ def analyze_contract(
         "ownership_pattern": owner_pattern,
         "honeypot_pattern": honeypot_pattern,
         "token_tax_pattern": tax_pattern,
-         "erc20_detected": erc20_detected,
+        "erc20_detected": erc20_detected,
+        "verified_contract": verified_contract,
         "owner_detected": owner_address is not None,
         "ownership_renounced": ownership_renounced,
         "proxy_implementation_detected": implementation_address is not None,
@@ -156,14 +170,14 @@ def analyze_contract(
             "address": address,
             "has_code": has_code,
             "code_size": code_size,
+            "proxy_pattern_detected": proxy_pattern,
+            "ownership_pattern_detected": owner_pattern,
             "implementation_address": implementation_address,
             "owner_address": owner_address,
             "ownership_renounced": ownership_renounced,
-            "proxy_pattern_detected": proxy_pattern,
-            "ownership_pattern_detected": owner_pattern,
+            "erc20_detected": erc20_detected,
+            "verified_contract": verified_contract,
             "token_tax_pattern_detected": tax_pattern,
-"erc20_detected": erc20_detected,
-            "honeypot_pattern_detected": honeypot_pattern,
             "risk_score": risk_score,
             "risk_level": risk_level,
             "flags": flags,
