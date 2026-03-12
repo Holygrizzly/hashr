@@ -28,6 +28,27 @@ def analyze_contract(
 
     code = w3.eth.get_code(address).hex()
 
+    owner_address = None
+    ownership_renounced = False
+
+    try:
+        owner_abi = [{
+            "constant": True,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [{"name": "", "type": "address"}],
+            "type": "function"
+        }]
+
+        contract = w3.eth.contract(address=address, abi=owner_abi)
+        owner_address = contract.functions.owner().call()
+
+        if owner_address == "0x0000000000000000000000000000000000000000":
+            ownership_renounced = True
+
+    except Exception:
+        owner_address = None
+
     has_code = code != "0x"
     code_size = len(code)
 
@@ -73,6 +94,8 @@ def analyze_contract(
         "proxy_pattern": proxy_pattern,
         "ownership_pattern": owner_pattern,
         "honeypot_pattern": honeypot_pattern,
+        "owner_detected": owner_address is not None,
+        "ownership_renounced": ownership_renounced,
     }
 
     return {
@@ -82,6 +105,8 @@ def analyze_contract(
             "address": address,
             "has_code": has_code,
             "code_size": code_size,
+            "owner_address": owner_address,
+            "ownership_renounced": ownership_renounced,
             "proxy_pattern_detected": proxy_pattern,
             "ownership_pattern_detected": owner_pattern,
             "honeypot_pattern_detected": honeypot_pattern,
