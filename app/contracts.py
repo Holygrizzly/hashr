@@ -67,6 +67,22 @@ def analyze_contract(
     proxy_pattern = "delegatecall" in code.lower()
     owner_pattern = "owner" in code.lower()
 
+    tax_pattern = False
+
+    tax_keywords = [
+        "tax",
+        "fee",
+        "maxsell",
+        "maxsellamount",
+        "maxtransaction",
+        "tradingenabled",
+    ]
+
+    for keyword in tax_keywords:
+        if keyword in code.lower():
+            tax_pattern = True
+            break
+
     honeypot_pattern = False
 
     suspicious_patterns = [
@@ -91,6 +107,9 @@ def analyze_contract(
     if owner_pattern:
         risk_score += 10
 
+    if tax_pattern:
+        risk_score += 20
+
     if honeypot_pattern:
         risk_score += 40
 
@@ -106,13 +125,13 @@ def analyze_contract(
         "proxy_pattern": proxy_pattern,
         "ownership_pattern": owner_pattern,
         "honeypot_pattern": honeypot_pattern,
+        "token_tax_pattern": tax_pattern,
         "owner_detected": owner_address is not None,
         "ownership_renounced": ownership_renounced,
         "proxy_implementation_detected": implementation_address is not None,
     }
 
     return {
-        
         "service": "hashr",
         "version": VERSION,
         "analysis": {
@@ -124,6 +143,7 @@ def analyze_contract(
             "ownership_renounced": ownership_renounced,
             "proxy_pattern_detected": proxy_pattern,
             "ownership_pattern_detected": owner_pattern,
+            "token_tax_pattern_detected": tax_pattern,
             "honeypot_pattern_detected": honeypot_pattern,
             "risk_score": risk_score,
             "risk_level": risk_level,
