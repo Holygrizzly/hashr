@@ -19,6 +19,7 @@ def analyze_contract(
     request: Request,
     x_402_payment: str | None = Header(None, alias="X-402-Payment"), # formatting
     
+    
 ):
     verify_payment(job_id="contract_analyze", request=request, x_402_payment=x_402_payment)
 
@@ -30,6 +31,21 @@ def analyze_contract(
     code = w3.eth.get_code(address).hex()
 
     implementation_address = None
+    
+     erc20_functions = [
+        "70a08231",  # balanceOf
+        "a9059cbb",  # transfer
+        "095ea7b3",  # approve
+        "23b872dd",  # transferFrom
+    ]
+
+    erc20_detected = False
+
+    for sig in erc20_functions:
+        if sig in code.lower():
+            erc20_detected = True
+            break
+
 
     try:
         slot = "0x360894A13BA1A3210667C828492DB98DCA3E2076CC3735A920A3CA505D382BBC"
@@ -127,6 +143,7 @@ def analyze_contract(
         "ownership_pattern": owner_pattern,
         "honeypot_pattern": honeypot_pattern,
         "token_tax_pattern": tax_pattern,
+         "erc20_detected": erc20_detected,
         "owner_detected": owner_address is not None,
         "ownership_renounced": ownership_renounced,
         "proxy_implementation_detected": implementation_address is not None,
@@ -145,6 +162,7 @@ def analyze_contract(
             "proxy_pattern_detected": proxy_pattern,
             "ownership_pattern_detected": owner_pattern,
             "token_tax_pattern_detected": tax_pattern,
+"erc20_detected": erc20_detected,
             "honeypot_pattern_detected": honeypot_pattern,
             "risk_score": risk_score,
             "risk_level": risk_level,
