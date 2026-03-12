@@ -116,3 +116,4 @@ def analyze_contract(
             "status": "basic-security-analysis",
         },
     }
+
