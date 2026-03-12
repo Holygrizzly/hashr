@@ -17,7 +17,8 @@ w3 = Web3(Web3.HTTPProvider(RPC_URL))
 def analyze_contract(
     payload: dict,
     request: Request,
-    x_402_payment: str | None = Header(None, alias="X-402-Payment"),
+    x_402_payment: str | None = Header(None, alias="X-402-Payment"), # formatting
+    
 ):
     verify_payment(job_id="contract_analyze", request=request, x_402_payment=x_402_payment)
 
