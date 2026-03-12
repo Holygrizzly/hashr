@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request, Header
 from pathlib import Path
 from web3 import Web3
 import os
+
+from .payment import verify_payment
 
 router = APIRouter(prefix="/simulate", tags=["simulation"])
 
@@ -11,7 +13,13 @@ RPC_URL = os.getenv("ETH_RPC_URL", "https://rpc.ankr.com/eth")
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 @router.post("/transaction")
-def simulate_transaction(payload: dict):
+def simulate_transaction(
+    payload: dict,
+    request: Request,
+    x_402_payment: str | None = Header(None, alias="X-402-Payment"),
+):
+    verify_payment(job_id="simulate_tx", request=request, x_402_payment=x_402_payment)
+
     tx = payload.get("tx")
 
     try:
