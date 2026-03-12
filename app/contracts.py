@@ -34,6 +34,17 @@ def analyze_contract(
     proxy_pattern = "delegatecall" in code.lower()
     owner_pattern = "owner" in code.lower()
 
+    risk_score = 0
+
+    if not has_code:
+        risk_score += 50
+
+    if proxy_pattern:
+        risk_score += 25
+
+    if owner_pattern:
+        risk_score += 10
+
     return {
         "service": "hashr",
         "version": VERSION,
@@ -43,6 +54,7 @@ def analyze_contract(
             "code_size": code_size,
             "proxy_pattern_detected": proxy_pattern,
             "ownership_pattern_detected": owner_pattern,
+            "risk_score": risk_score,
             "status": "basic-security-analysis",
         },
     }
