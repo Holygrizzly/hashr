@@ -34,6 +34,19 @@ def analyze_contract(
     proxy_pattern = "delegatecall" in code.lower()
     owner_pattern = "owner" in code.lower()
 
+    honeypot_pattern = False
+
+    suspicious_patterns = [
+        "transferfrom",
+        "revert",
+        "require",
+    ]
+
+    for pattern in suspicious_patterns:
+        if pattern in code.lower():
+            honeypot_pattern = True
+            break
+
     risk_score = 0
 
     if not has_code:
@@ -44,6 +57,9 @@ def analyze_contract(
 
     if owner_pattern:
         risk_score += 10
+
+    if honeypot_pattern:
+        risk_score += 40
 
     if risk_score >= 50:
         risk_level = "high"
@@ -56,6 +72,7 @@ def analyze_contract(
         "no_code": not has_code,
         "proxy_pattern": proxy_pattern,
         "ownership_pattern": owner_pattern,
+        "honeypot_pattern": honeypot_pattern,
     }
 
     return {
@@ -67,6 +84,7 @@ def analyze_contract(
             "code_size": code_size,
             "proxy_pattern_detected": proxy_pattern,
             "ownership_pattern_detected": owner_pattern,
+            "honeypot_pattern_detected": honeypot_pattern,
             "risk_score": risk_score,
             "risk_level": risk_level,
             "flags": flags,
