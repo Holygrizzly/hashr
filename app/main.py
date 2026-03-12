@@ -17,6 +17,8 @@ from .metrics import router as metrics_router
 from .handshake import router as handshake_router
 from .payments import router as payments_router
 from .queue import router as queue_router
+from .simulate import router as simulate_router
+
 
 app = FastAPI(
     title="hashr",
@@ -41,6 +43,7 @@ app.include_router(metrics_router)
 app.include_router(handshake_router)
 app.include_router(payments_router)
 app.include_router(queue_router)
+app.include_router(simulate_router)
 
 
 @app.get("/")
