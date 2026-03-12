@@ -12,6 +12,7 @@ VERSION = Path("VERSION").read_text().strip()
 RPC_URL = os.getenv("ETH_RPC_URL", "https://rpc.ankr.com/eth")
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
+
 @router.post("/analyze")
 def analyze_contract(
     payload: dict,
@@ -27,14 +28,21 @@ def analyze_contract(
 
     code = w3.eth.get_code(address).hex()
 
+    has_code = code != "0x"
+    code_size = len(code)
+
+    proxy_pattern = "delegatecall" in code.lower()
+    owner_pattern = "owner" in code.lower()
+
     return {
         "service": "hashr",
         "version": VERSION,
         "analysis": {
             "address": address,
-            "code_size": len(code),
-            "has_code": code != "0x",
-            "status": "basic-analysis",
-            "note": "advanced security checks not implemented yet",
+            "has_code": has_code,
+            "code_size": code_size,
+            "proxy_pattern_detected": proxy_pattern,
+            "ownership_pattern_detected": owner_pattern,
+            "status": "basic-security-analysis",
         },
     }
