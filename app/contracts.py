@@ -117,3 +117,5 @@ def analyze_contract(
         },
     }
 
+
+# ownership detection formatting
