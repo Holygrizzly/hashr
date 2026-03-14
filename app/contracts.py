@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, Header
+import json
 from pathlib import Path
 from web3 import Web3
 import os
@@ -12,7 +13,12 @@ VERSION = Path("VERSION").read_text().strip()
 RPC_URL = os.getenv("ETH_RPC_URL", "https://rpc.ankr.com/eth")
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
-analysis_cache = {}
+CACHE_FILE = Path("analysis_cache.json")
+
+if CACHE_FILE.exists():
+    analysis_cache = json.loads(CACHE_FILE.read_text())
+else:
+    analysis_cache = {}
 
 
 @router.post("/analyze")
@@ -221,6 +227,7 @@ def analyze_contract(
     }
 
     analysis_cache[address] = analysis
+    CACHE_FILE.write_text(json.dumps(analysis_cache))
 
     return {
         "service": "hashr",
