@@ -27,6 +27,21 @@ def analyze_contract(
         return {"error": "contract address required"}
 
     code = w3.eth.get_code(address).hex()
+    
+     dangerous_opcodes = [
+        "selfdestruct",
+        "suicide",
+        "delegatecall",
+        "callcode",
+    ]
+
+    dangerous_opcode_detected = False
+
+    for opcode in dangerous_opcodes:
+        if opcode in code.lower():
+            dangerous_opcode_detected = True
+            break
+
 
     owner_address = None
     ownership_renounced = False
@@ -130,6 +145,8 @@ def analyze_contract(
 
     if proxy_pattern:
         risk_score += 20
+if dangerous_opcode_detected:
+    risk_score += 30
 
     if owner_pattern:
         risk_score += 10
@@ -161,6 +178,7 @@ def analyze_contract(
         "owner_detected": owner_address is not None,
         "ownership_renounced": ownership_renounced,
         "proxy_implementation_detected": implementation_address is not None,
+"dangerous_opcode": dangerous_opcode_detected,
     }
 
     return {
@@ -177,6 +195,7 @@ def analyze_contract(
             "ownership_renounced": ownership_renounced,
             "erc20_detected": erc20_detected,
             "verified_contract": verified_contract,
+"dangerous_opcode_detected": dangerous_opcode_detected,
             "token_tax_pattern_detected": tax_pattern,
             "risk_score": risk_score,
             "risk_level": risk_level,
