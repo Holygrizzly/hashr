@@ -113,6 +113,18 @@ def analyze_contract(
             verified_contract = True
             break
 
+    mint_pattern = False
+    mint_keywords = [
+        "mint",
+        "_mint",
+        "mintto",
+        "createtokens",
+    ]
+    for keyword in mint_keywords:
+        if keyword in code.lower():
+            mint_pattern = True
+            break
+
     tax_pattern = False
     tax_keywords = [
         "tax",
@@ -138,6 +150,8 @@ def analyze_contract(
         risk_score += 10
     if honeypot_pattern:
         risk_score += 20
+    if mint_pattern:
+        risk_score += 15
     if tax_pattern:
         risk_score += 20
     if not verified_contract:
@@ -157,6 +171,7 @@ def analyze_contract(
         "proxy_pattern": proxy_pattern,
         "ownership_pattern": owner_pattern,
         "honeypot_pattern": honeypot_pattern,
+        "mint_capability": mint_pattern,
         "token_tax_pattern": tax_pattern,
         "erc20_detected": erc20_detected,
         "verified_contract": verified_contract,
@@ -181,6 +196,7 @@ def analyze_contract(
             "ownership_renounced": ownership_renounced,
             "erc20_detected": erc20_detected,
             "verified_contract": verified_contract,
+            "mint_capability_detected": mint_pattern,
             "dangerous_opcode_detected": dangerous_opcode_detected,
             "upgradeable_proxy_detected": upgradeable_proxy,
             "token_tax_pattern_detected": tax_pattern,
