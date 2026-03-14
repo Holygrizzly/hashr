@@ -176,6 +176,12 @@ def analyze_contract(
     else:
         risk_level = "low"
 
+    recommendation = "safe"
+    if risk_level == "high":
+        recommendation = "avoid"
+    elif risk_level == "medium":
+        recommendation = "caution"
+
     flags = {
         "no_code": not has_code,
         "proxy_pattern": proxy_pattern,
@@ -209,6 +215,7 @@ def analyze_contract(
         "token_tax_pattern_detected": tax_pattern,
         "risk_score": risk_score,
         "risk_level": risk_level,
+        "recommendation": recommendation,
         "flags": flags,
         "status": "basic-security-analysis",
     }
@@ -221,11 +228,12 @@ def analyze_contract(
         "analysis": analysis,
     }
 
+
 @router.post("/analyze/batch")
 def analyze_contract_batch(
     payload: dict,
     request: Request,
-    x_402_payment: str | None = Header(None, alias="X-402-Payment")
+    x_402_payment: str | None = Header(None, alias="X-402-Payment"),
 ):
     verify_payment(
         job_id="contract_analyze_batch",
