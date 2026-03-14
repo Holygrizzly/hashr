@@ -220,3 +220,34 @@ def analyze_contract(
         "version": VERSION,
         "analysis": analysis,
     }
+
+@router.post("/analyze/batch")
+def analyze_contract_batch(
+    payload: dict,
+    request: Request,
+    x_402_payment: str | None = Header(None, alias="X-402-Payment")
+):
+    verify_payment(
+        job_id="contract_analyze_batch",
+        request=request,
+        x_402_payment=x_402_payment,
+    )
+
+    addresses = payload.get("addresses", [])
+
+    results = []
+
+    for addr in addresses:
+        results.append(
+            analyze_contract(
+                {"address": addr},
+                request,
+                x_402_payment,
+            )
+        )
+
+    return {
+        "service": "hashr",
+        "version": VERSION,
+        "results": results,
+    }
