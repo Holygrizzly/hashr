@@ -27,25 +27,21 @@ def analyze_contract(
         return {"error": "contract address required"}
 
     code = w3.eth.get_code(address).hex()
-    
-     dangerous_opcodes = [
+
+    dangerous_opcodes = [
         "selfdestruct",
         "suicide",
         "delegatecall",
         "callcode",
     ]
-
     dangerous_opcode_detected = False
-
     for opcode in dangerous_opcodes:
         if opcode in code.lower():
             dangerous_opcode_detected = True
             break
 
-
     owner_address = None
     ownership_renounced = False
-
     try:
         owner_abi = [
             {
@@ -56,10 +52,8 @@ def analyze_contract(
                 "type": "function",
             }
         ]
-
         contract = w3.eth.contract(address=address, abi=owner_abi)
         owner_address = contract.functions.owner().call()
-
         if owner_address == "0x0000000000000000000000000000000000000000":
             ownership_renounced = True
     except Exception:
@@ -78,22 +72,23 @@ def analyze_contract(
         "assert",
         "stop",
     ]
-
     for term in suspicious_terms:
         if term in code.lower():
             honeypot_pattern = True
             break
 
     implementation_address = None
-
     try:
         slot = "0x360894A13BA1A3210667C828492DB98DCA3E2076CC3735A920A3CA505D382BBC"
         raw = w3.eth.get_storage_at(address, slot).hex()
-
         if raw and raw != "0x":
             implementation_address = "0x" + raw[-40:]
     except Exception:
         implementation_address = None
+
+    upgradeable_proxy = False
+    if implementation_address and not ownership_renounced:
+        upgradeable_proxy = True
 
     erc20_functions = [
         "70a08231",  # balanceOf
@@ -101,29 +96,24 @@ def analyze_contract(
         "095ea7b3",  # approve
         "23b872dd",  # transferFrom
     ]
-
     erc20_detected = False
-
     for sig in erc20_functions:
         if sig in code.lower():
             erc20_detected = True
             break
 
     verified_contract = False
-
     metadata_markers = [
         "a2646970667358",  # solc metadata prefix
         "solc",
         "ipfs",
     ]
-
     for marker in metadata_markers:
         if marker in code.lower():
             verified_contract = True
             break
 
     tax_pattern = False
-
     tax_keywords = [
         "tax",
         "fee",
@@ -132,33 +122,28 @@ def analyze_contract(
         "maxtransaction",
         "tradingenabled",
     ]
-
     for keyword in tax_keywords:
         if keyword in code.lower():
             tax_pattern = True
             break
 
     risk_score = 0
-
     if not has_code:
         risk_score += 50
-
     if proxy_pattern:
         risk_score += 20
-if dangerous_opcode_detected:
-    risk_score += 30
-
+    if dangerous_opcode_detected:
+        risk_score += 30
     if owner_pattern:
         risk_score += 10
-
     if honeypot_pattern:
         risk_score += 20
-
     if tax_pattern:
         risk_score += 20
-
     if not verified_contract:
         risk_score += 5
+    if upgradeable_proxy:
+        risk_score += 20
 
     if risk_score >= 50:
         risk_level = "high"
@@ -175,10 +160,11 @@ if dangerous_opcode_detected:
         "token_tax_pattern": tax_pattern,
         "erc20_detected": erc20_detected,
         "verified_contract": verified_contract,
+        "dangerous_opcode": dangerous_opcode_detected,
+        "upgradeable_proxy": upgradeable_proxy,
         "owner_detected": owner_address is not None,
         "ownership_renounced": ownership_renounced,
         "proxy_implementation_detected": implementation_address is not None,
-"dangerous_opcode": dangerous_opcode_detected,
     }
 
     return {
@@ -195,7 +181,8 @@ if dangerous_opcode_detected:
             "ownership_renounced": ownership_renounced,
             "erc20_detected": erc20_detected,
             "verified_contract": verified_contract,
-"dangerous_opcode_detected": dangerous_opcode_detected,
+            "dangerous_opcode_detected": dangerous_opcode_detected,
+            "upgradeable_proxy_detected": upgradeable_proxy,
             "token_tax_pattern_detected": tax_pattern,
             "risk_score": risk_score,
             "risk_level": risk_level,
