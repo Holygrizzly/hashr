@@ -12,6 +12,8 @@ VERSION = Path("VERSION").read_text().strip()
 RPC_URL = os.getenv("ETH_RPC_URL", "https://rpc.ankr.com/eth")
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
+analysis_cache = {}
+
 
 @router.post("/analyze")
 def analyze_contract(
@@ -25,6 +27,14 @@ def analyze_contract(
 
     if not address:
         return {"error": "contract address required"}
+
+    if address in analysis_cache:
+        return {
+            "service": "hashr",
+            "version": VERSION,
+            "cached": True,
+            "analysis": analysis_cache[address],
+        }
 
     code = w3.eth.get_code(address).hex()
 
@@ -182,27 +192,31 @@ def analyze_contract(
         "proxy_implementation_detected": implementation_address is not None,
     }
 
+    analysis = {
+        "address": address,
+        "has_code": has_code,
+        "code_size": code_size,
+        "proxy_pattern_detected": proxy_pattern,
+        "ownership_pattern_detected": owner_pattern,
+        "implementation_address": implementation_address,
+        "owner_address": owner_address,
+        "ownership_renounced": ownership_renounced,
+        "erc20_detected": erc20_detected,
+        "verified_contract": verified_contract,
+        "mint_capability_detected": mint_pattern,
+        "dangerous_opcode_detected": dangerous_opcode_detected,
+        "upgradeable_proxy_detected": upgradeable_proxy,
+        "token_tax_pattern_detected": tax_pattern,
+        "risk_score": risk_score,
+        "risk_level": risk_level,
+        "flags": flags,
+        "status": "basic-security-analysis",
+    }
+
+    analysis_cache[address] = analysis
+
     return {
         "service": "hashr",
         "version": VERSION,
-        "analysis": {
-            "address": address,
-            "has_code": has_code,
-            "code_size": code_size,
-            "proxy_pattern_detected": proxy_pattern,
-            "ownership_pattern_detected": owner_pattern,
-            "implementation_address": implementation_address,
-            "owner_address": owner_address,
-            "ownership_renounced": ownership_renounced,
-            "erc20_detected": erc20_detected,
-            "verified_contract": verified_contract,
-            "mint_capability_detected": mint_pattern,
-            "dangerous_opcode_detected": dangerous_opcode_detected,
-            "upgradeable_proxy_detected": upgradeable_proxy,
-            "token_tax_pattern_detected": tax_pattern,
-            "risk_score": risk_score,
-            "risk_level": risk_level,
-            "flags": flags,
-            "status": "basic-security-analysis",
-        },
+        "analysis": analysis,
     }
